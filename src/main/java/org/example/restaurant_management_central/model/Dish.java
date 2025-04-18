@@ -10,6 +10,6 @@ import lombok.Setter;
 public class Dish {
     private Long id;
     private Integer originalId;
-    private String nom;
+    private String name;
     private PointDeVente pointDeVente;
 }

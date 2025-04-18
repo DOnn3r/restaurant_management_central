@@ -12,5 +12,6 @@ import java.time.LocalDateTime;
 public class PointDeVente {
     private int id;
     private String name;
+    private String url;
     private LocalDateTime lastSync;
 }

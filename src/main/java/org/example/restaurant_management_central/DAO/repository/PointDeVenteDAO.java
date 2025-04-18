@@ -1,12 +1,15 @@
 package org.example.restaurant_management_central.DAO.repository;
 
 import org.example.restaurant_management_central.model.PointDeVente;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public class PointDeVenteDAO {
@@ -16,50 +19,25 @@ public class PointDeVenteDAO {
         this.dataSource = new DataSource();
     }
 
-    public void saveAll(List<PointDeVente> pointDeVentes) throws SQLException {
-        List<PointDeVente> pointDeVenteList = new ArrayList<PointDeVente>();
-        try{
-            Connection connection = dataSource.getConnection();
-            connection.setAutoCommit(false);
+    public List<PointDeVente> getAllPointDeVente() {
+        List<PointDeVente> pointsDeVente = new ArrayList<>();
+        String sql = "SELECT id, name, url FROM point_of_sale";
 
-            for(PointDeVente pointDeVente : pointDeVentes){
-                String sql = "insert into point_de_vente values(?,?)";
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
 
-                try(PreparedStatement statement = connection.prepareStatement(sql)){
-                    statement.setString(1, pointDeVente.getName());
-                    statement.setTimestamp(2, Timestamp.valueOf(pointDeVente.getLastSync()));
-
-                    try(ResultSet resultSet = statement.executeQuery()){
-                        if(resultSet.next()){
-                            pointDeVenteList.add(pointDeVente);
-                        }
-                    }
-                }
+            while (rs.next()) {
+                pointsDeVente.add(new PointDeVente(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("url"),
+                        rs.getTimestamp("last_sync").toLocalDateTime()
+                ));
             }
-            connection.commit();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
-    }
-
-    public Optional<PointDeVente> findById(Long id) throws SQLException {
-        String sql = "SELECT * FROM point_de_vente WHERE id = ?";
-        try(Connection connection = dataSource.getConnection();
-        PreparedStatement statement = connection.prepareStatement(sql){
-            statement.setLong(1, id);
-            try(ResultSet resultSet = statement.executeQuery()){
-                if(resultSet.next()){
-                    return Optional.of(mapToPointDeVente(resultSet));
-                }
-            }
-        }
-    }
-
-    private PointDeVente mapToPointDeVente(ResultSet rs) throws SQLException {
-        return new PointDeVente(
-                rs.getInt("id"),
-                rs.getString("nom"),
-                rs.getTimestamp("last_sync").toLocalDateTime()
-        );
+        return pointsDeVente;
     }
 }
