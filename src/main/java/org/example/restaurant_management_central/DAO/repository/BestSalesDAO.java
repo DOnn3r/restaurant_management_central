@@ -49,6 +49,26 @@ public class BestSalesDAO {
         return bestSalesList;
     }
 
+    public void saveBestSales(BestSales bestSales){
+        String insertSql = "INSERT INTO best_sales (dish_id, quantity_sold, total_amount, calculation_date, point_of_sale_id) "
+                + "VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+
+            insertStmt.setInt(1, bestSales.getDishId());
+            insertStmt.setInt(2, bestSales.getQuantitySold());
+            insertStmt.setDouble(3, bestSales.getTotalAmount());
+            insertStmt.setDate(4, Date.valueOf(bestSales.getCalculationDate()));
+
+            int affectedRows = insertStmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Creating best sales failed, no rows affected.");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
     public void saveBestSales(BestSales bestSales, int pointOfSaleId) throws SQLException {
         // 1. Vérification que le plat existe pour ce point de vente
         String checkDishSql = "SELECT id FROM dish WHERE original_id = ? AND point_of_sale_id = ?";

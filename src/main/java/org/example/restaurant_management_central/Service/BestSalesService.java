@@ -79,4 +79,11 @@ public class BestSalesService {
     public List<BestSales> getAll(){
         return bestSalesDAO.getRealBestSales();
     }
+
+    @SneakyThrows
+    public void saveCalculatedBestSales(List<BestSales> bestSales) {
+        for (BestSales bs : bestSales) {
+            bestSalesDAO.saveBestSales(bs);
+        }
+    }
 }
