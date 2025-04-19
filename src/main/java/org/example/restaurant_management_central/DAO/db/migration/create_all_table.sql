@@ -1,12 +1,12 @@
 CREATE TABLE point_of_sale (
-                               id SERIAL PRIMARY KEY DEFAULT ,
+                               id SERIAL PRIMARY KEY,
                                name VARCHAR(100) NOT NULL,
                                url VARCHAR(255) NOT NULL,
                                last_sync TIMESTAMP
 );
 
 CREATE TABLE dish (
-                      id SERIAL PRIMARY KEY DEFAULT,
+                      id SERIAL PRIMARY KEY,
                       original_id INTEGER NOT NULL,
                       name VARCHAR(100) NOT NULL,
                       point_of_sale_id INTEGER NOT NULL REFERENCES point_of_sale(id),
@@ -14,7 +14,7 @@ CREATE TABLE dish (
 );
 
 CREATE TABLE best_sales (
-                            id SERIAL PRIMARY KEY DEFAULT,
+                            id SERIAL PRIMARY KEY,
                             dish_id INTEGER NOT NULL REFERENCES dish(id),
                             quantity_sold INTEGER NOT NULL,
                             total_amount DECIMAL(10, 2) NOT NULL,

@@ -11,13 +11,13 @@ import java.util.List;
 
 @Repository
 public class DishOrderDAO {
-    private DataSource dataSource;
+    private DbConnection dataSource;
 
     public DishOrderDAO() {
-        this.dataSource = new DataSource();
+        this.dataSource = new DbConnection();
     }
 
-    public DishOrderDAO(DataSource dataSource) {
+    public DishOrderDAO(DbConnection dataSource) {
         this.dataSource = dataSource;
     }
 

@@ -7,7 +7,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 @Configuration
-public class DataSource {
+public class DbConnection {
     private final int defaultPort = 5432;
     private final String host = System.getenv("DATABASE_HOST");
     private final String user = System.getenv("DATABASE_USER");
@@ -15,7 +15,7 @@ public class DataSource {
     private final String database = System.getenv("DATABASE_NAME");
     private final String jdbcUrl;
 
-    public DataSource() {
+    public DbConnection() {
         jdbcUrl = "jdbc:postgresql://" + host + ":" + defaultPort + "/" + database;
     }
 

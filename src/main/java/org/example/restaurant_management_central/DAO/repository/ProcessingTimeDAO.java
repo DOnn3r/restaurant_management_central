@@ -11,13 +11,13 @@ import java.util.List;
 
 @Repository
 public class ProcessingTimeDAO {
-    private final DataSource dataSource;
+    private final DbConnection dataSource;
 
-    public ProcessingTimeDAO(DataSource dataSource) {
+    public ProcessingTimeDAO(DbConnection dataSource) {
         this.dataSource = dataSource;
     }
     public ProcessingTimeDAO(){
-        this.dataSource = new DataSource();
+        this.dataSource = new DbConnection();
     }
     public void saveProcessingTime(ProcessingTimeResponse processingTime) throws SQLException {
         String sql = """

@@ -1,7 +1,6 @@
 package org.example.restaurant_management_central.DAO.repository;
 
 import org.example.restaurant_management_central.model.BestSales;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -10,13 +9,13 @@ import java.util.List;
 
 @Repository
 public class BestSalesDAO {
-    private DataSource dataSource;
+    private final DbConnection dataSource;
 
     public BestSalesDAO() {
-        this.dataSource = new DataSource();
+        this.dataSource = new DbConnection();
     }
 
-    public BestSalesDAO(DataSource dataSource) {
+    public BestSalesDAO(DbConnection dataSource) {
         this.dataSource = dataSource;
     }
 

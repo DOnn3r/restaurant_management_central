@@ -1,7 +1,6 @@
 package org.example.restaurant_management_central.DAO.repository;
 
 import org.example.restaurant_management_central.model.PointDeVente;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
@@ -13,10 +12,10 @@ import java.util.List;
 
 @Repository
 public class PointDeVenteDAO {
-    private DataSource dataSource;
+    private DbConnection dataSource;
 
     public PointDeVenteDAO(){
-        this.dataSource = new DataSource();
+        this.dataSource = new DbConnection();
     }
 
     public List<PointDeVente> getAllPointDeVente() {

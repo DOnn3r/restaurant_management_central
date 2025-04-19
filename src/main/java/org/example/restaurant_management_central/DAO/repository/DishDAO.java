@@ -10,13 +10,13 @@ import java.sql.SQLException;
 
 @Repository
 public class DishDAO {
-    private DataSource dataSource;
+    private DbConnection dataSource;
 
     public DishDAO() {
-        this.dataSource = new DataSource();
+        this.dataSource = new DbConnection();
     }
 
-    public DishDAO(DataSource dataSource) {
+    public DishDAO(DbConnection dataSource) {
         this.dataSource = dataSource;
     }
 
