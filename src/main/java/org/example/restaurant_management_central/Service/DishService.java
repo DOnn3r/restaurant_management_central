@@ -3,11 +3,13 @@ package org.example.restaurant_management_central.Service;
 import org.example.restaurant_management_central.DAO.repository.DishDAO;
 import org.example.restaurant_management_central.DAO.repository.DishOrderDAO;
 import org.example.restaurant_management_central.model.*;
+import org.springframework.stereotype.Service;
 
 import java.time.*;
 import java.util.*;
 import java.util.stream.*;
 
+@Service
 public class DishService {
     private final DishOrderDAO dishOrderDao;
     private final DishDAO dishDao;

@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import org.example.restaurant_management_central.DAO.repository.PointDeVenteDAO;
 import org.example.restaurant_management_central.DAO.repository.ProcessingTimeDAO;
 import org.example.restaurant_management_central.DTO.ProcessingTimeDTO;
+import org.example.restaurant_management_central.model.BestSales;
 import org.example.restaurant_management_central.model.PointDeVente;
 import org.example.restaurant_management_central.model.ProcessingTimeResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,8 @@ public class ProcessingTimeService {
 
     @SneakyThrows
     public void saveCalculatedProcessingTimes(List<ProcessingTimeResponse> processingTimes) {
-        processingTimes.forEach(processingTimeDAO::saveProcessingTime);
+        for (ProcessingTimeResponse bs : processingTimes) {
+            processingTimeDAO.saveProcessingTime(bs);
+        }
     }
 }

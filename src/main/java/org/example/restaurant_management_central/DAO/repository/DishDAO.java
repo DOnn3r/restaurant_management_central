@@ -1,12 +1,14 @@
 package org.example.restaurant_management_central.DAO.repository;
 
 import org.example.restaurant_management_central.model.Dish;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+@Repository
 public class DishDAO {
     private DataSource dataSource;
 

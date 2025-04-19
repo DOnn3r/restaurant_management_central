@@ -60,6 +60,8 @@ public class BestSalesService {
 
     @SneakyThrows
     public void saveCalculatedBestSales(List<BestSales> bestSales) {
-        bestSales.forEach(bestSalesDAO::saveBestSales);
+        for (BestSales bs : bestSales) {
+            bestSalesDAO.saveBestSales(bs);
+        }
     }
 }

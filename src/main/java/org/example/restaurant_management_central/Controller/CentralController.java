@@ -28,6 +28,11 @@ public class CentralController {
         this.dishService = dishService;
     }
 
+    @GetMapping("/ping")
+    public String ping(){
+        return "pong";
+    }
+
     @PostMapping("/synchronisation")
     public ResponseEntity<String> syncBestSales() throws SQLException {
         bestSalesService.syncBestSalesFromAllPoints();

@@ -3,11 +3,13 @@ package org.example.restaurant_management_central.DAO.repository;
 import org.example.restaurant_management_central.model.CalculationType;
 import org.example.restaurant_management_central.model.ProcessingTimeResponse;
 import org.example.restaurant_management_central.model.TimeUnit;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class ProcessingTimeDAO {
     private final DataSource dataSource;
 

@@ -2,12 +2,14 @@ package org.example.restaurant_management_central.DAO.repository;
 
 import org.example.restaurant_management_central.model.DishOrder;
 import org.example.restaurant_management_central.model.Status;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class DishOrderDAO {
     private DataSource dataSource;
 
