@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.example.restaurant_management_central.DAO.repository.BestSalesDAO;
 import org.example.restaurant_management_central.DAO.repository.PointDeVenteDAO;
 import org.example.restaurant_management_central.DTO.BestSalesDTO;
+import org.example.restaurant_management_central.DTO.PointDeVenteBestSaleResponse;
 import org.example.restaurant_management_central.model.BestSales;
 import org.example.restaurant_management_central.model.PointDeVente;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,36 +36,35 @@ public class BestSalesService {
 
     public void syncBestSalesFromAllPoints() throws SQLException {
         List<PointDeVente> pointsDeVente = pointDeVenteDAO.getAllPointDeVente();
-        BestSalesService.log.info("Starting synchronization for {} points de vente", pointsDeVente.size());
+        log.info("Starting sync for {} points", pointsDeVente.size());
 
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusDays(7);
 
         for (PointDeVente pdv : pointsDeVente) {
             String apiUrl = pdv.getUrl() + "/bestSales?startDate=" + startDate + "&endDate=" + endDate;
-            log.debug("Fetching best sales from: {}", apiUrl);
+            log.debug("Fetching from: {}", apiUrl);
 
-            BestSalesDTO[] bestSalesArray = restTemplate.getForObject(apiUrl, BestSalesDTO[].class);
-            if (bestSalesArray == null) continue;
+            // Désormais, on attend un tableau de PointDeVenteBestSalesResponse
+            PointDeVenteBestSaleResponse[] responseArray = restTemplate.getForObject(
+                    apiUrl,
+                    PointDeVenteBestSaleResponse[].class
+            );
 
-            List<BestSalesDTO> bestSalesFromPdv = Arrays.asList(bestSalesArray);
-            log.info("Received {} best sales from {}", bestSalesFromPdv.size(), pdv.getName());
+            if (responseArray == null || responseArray.length == 0) {
+                log.warn("No data from {}", pdv.getName());
+                continue;
+            }
 
-            for (BestSalesDTO dto : bestSalesFromPdv) {
-                try {
-                    BestSales bestSales = new BestSales(
-                            dto.getDishId().intValue(),
-                            dto.getDishName(),
-                            dto.getQuantitySold(),
-                            dto.getTotalAmount(),
-                            LocalDate.now()
-                    );
-                    bestSalesDAO.saveBestSales(bestSales);
-                    log.debug("Saved best sales for dish {}", dto.getDishId());
-                } catch (SQLException e) {
-                    log.error("Failed to save best sales for dish {}: {}", dto.getDishId(), e.getMessage());
-                    throw e;
-                }
+            for (PointDeVenteBestSaleResponse response : responseArray) {
+                BestSales bestSales = new BestSales(
+                        response.getDish().getId(),   // id
+                        response.getDish().getName(), // name
+                        response.getQuantitySold(),    // quantitySold
+                        response.getTotalPrice(),      // totalAmount
+                        LocalDate.now()                // date
+                );
+                bestSalesDAO.saveBestSales(bestSales);
             }
         }
     }
