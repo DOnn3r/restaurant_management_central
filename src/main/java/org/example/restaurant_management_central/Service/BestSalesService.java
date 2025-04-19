@@ -37,11 +37,16 @@ public class BestSalesService {
         List<PointDeVente> pointsDeVente = pointDeVenteDAO.getAllPointDeVente();
         BestSalesService.log.info("Starting synchronization for {} points de vente", pointsDeVente.size());
 
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(7);
+
         for (PointDeVente pdv : pointsDeVente) {
-            String apiUrl = pdv.getUrl() + "/bestSales";
+            String apiUrl = pdv.getUrl() + "/bestSales?startDate=" + startDate + "&endDate=" + endDate;
             log.debug("Fetching best sales from: {}", apiUrl);
 
             BestSalesDTO[] bestSalesArray = restTemplate.getForObject(apiUrl, BestSalesDTO[].class);
+            if (bestSalesArray == null) continue;
+
             List<BestSalesDTO> bestSalesFromPdv = Arrays.asList(bestSalesArray);
             log.info("Received {} best sales from {}", bestSalesFromPdv.size(), pdv.getName());
 

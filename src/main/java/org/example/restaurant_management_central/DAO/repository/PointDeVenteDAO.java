@@ -21,23 +21,28 @@ public class PointDeVenteDAO {
 
     public List<PointDeVente> getAllPointDeVente() {
         List<PointDeVente> pointsDeVente = new ArrayList<>();
-        String sql = "SELECT id, name, url FROM point_of_sale";
+        String sql = "SELECT id, name, url, last_sync FROM point_of_sale";
 
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                pointsDeVente.add(new PointDeVente(
-                        rs.getInt("id"),
-                        rs.getString("name"),
-                        rs.getString("url"),
-                        rs.getTimestamp("last_sync").toLocalDateTime()
-                ));
+                PointDeVente pointDeVente = PointDeVente.builder()
+                        .id(rs.getInt("id"))
+                        .name(rs.getString("name"))
+                        .url(rs.getString("url"))
+                        .lastSync(rs.getTimestamp("last_sync") != null
+                                ? rs.getTimestamp("last_sync").toLocalDateTime()
+                                : null)
+                        .build();
+
+                pointsDeVente.add(pointDeVente);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return pointsDeVente;
     }
+
 }
