@@ -24,7 +24,9 @@ public class BestSalesDAO {
         List<BestSales> bestSalesList = new ArrayList<>();
         String sql = "SELECT d.id, d.name as dish_name, SUM(bs.quantity_sold) as total_quantity, " +
                 "SUM(bs.total_amount) as total_amount, bs.calculation_date " +
-                "FROM best_sales bs JOIN dish d ON bs.dish_id = d.id " +
+                "FROM best_sales bs " +
+                "JOIN dish d ON bs.dish_id = d.id " +
+                "JOIN point_of_sale pos ON bs.point_of_sale_id = pos.id " + // Ajouté
                 "GROUP BY d.id, d.name, bs.calculation_date " +
                 "ORDER BY total_quantity DESC";
 
@@ -47,18 +49,37 @@ public class BestSalesDAO {
         return bestSalesList;
     }
 
-    public void saveBestSales(BestSales bestSales) throws SQLException {
-        String sql = "INSERT INTO best_sales (dish_id, quantity_sold, total_amount, calculation_date) VALUES (?, ?, ?, ?)";
+    public void saveBestSales(BestSales bestSales, int pointOfSaleId) throws SQLException {
+        // 1. Vérification que le plat existe pour ce point de vente
+        String checkDishSql = "SELECT id FROM dish WHERE original_id = ? AND point_of_sale_id = ?";
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement checkStmt = conn.prepareStatement(checkDishSql)) {
 
-            pstmt.setInt(1, bestSales.getDishId());
-            pstmt.setInt(2, bestSales.getQuantitySold());
-            pstmt.setDouble(3, bestSales.getTotalAmount());
-            pstmt.setDate(4, Date.valueOf(bestSales.getCalculationDate()));
+            checkStmt.setInt(1, bestSales.getDishId());
+            checkStmt.setInt(2, pointOfSaleId);
 
-            int affectedRows = pstmt.executeUpdate();
+            try (ResultSet rs = checkStmt.executeQuery()) {
+                if (!rs.next()) {
+                    throw new SQLException("Dish with original_id=" + bestSales.getDishId()
+                            + " does not exist for point_of_sale_id=" + pointOfSaleId);
+                }
+            }
+        }
+
+        String insertSql = "INSERT INTO best_sales (dish_id, quantity_sold, total_amount, calculation_date, point_of_sale_id) "
+                + "VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+
+            insertStmt.setInt(1, bestSales.getDishId());
+            insertStmt.setInt(2, bestSales.getQuantitySold());
+            insertStmt.setDouble(3, bestSales.getTotalAmount());
+            insertStmt.setDate(4, Date.valueOf(bestSales.getCalculationDate()));
+            insertStmt.setInt(5, pointOfSaleId);
+
+            int affectedRows = insertStmt.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("Creating best sales failed, no rows affected.");
             }

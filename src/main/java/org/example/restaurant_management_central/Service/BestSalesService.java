@@ -64,7 +64,7 @@ public class BestSalesService {
                         response.getTotalPrice(),      // totalAmount
                         LocalDate.now()                // date
                 );
-                bestSalesDAO.saveBestSales(bestSales);
+                bestSalesDAO.saveBestSales(bestSales, pdv.getId());
             }
         }
     }
@@ -78,12 +78,5 @@ public class BestSalesService {
 
     public List<BestSales> getAll(){
         return bestSalesDAO.getRealBestSales();
-    }
-
-    @SneakyThrows
-    public void saveCalculatedBestSales(List<BestSales> bestSales) {
-        for (BestSales bs : bestSales) {
-            bestSalesDAO.saveBestSales(bs);
-        }
     }
 }
