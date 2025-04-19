@@ -1,6 +1,8 @@
 package org.example.restaurant_management_central.Service;
 
 import lombok.SneakyThrows;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.example.restaurant_management_central.DAO.repository.BestSalesDAO;
 import org.example.restaurant_management_central.DAO.repository.PointDeVenteDAO;
 import org.example.restaurant_management_central.DTO.BestSalesDTO;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -18,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class BestSalesService {
+    private static final Logger log = LogManager.getLogger(BestSalesService.class);
     private final BestSalesDAO bestSalesDAO;
     private final PointDeVenteDAO pointDeVenteDAO;
     private final RestTemplate restTemplate;
@@ -31,22 +35,31 @@ public class BestSalesService {
 
     public void syncBestSalesFromAllPoints() throws SQLException {
         List<PointDeVente> pointsDeVente = pointDeVenteDAO.getAllPointDeVente();
+        BestSalesService.log.info("Starting synchronization for {} points de vente", pointsDeVente.size());
 
         for (PointDeVente pdv : pointsDeVente) {
             String apiUrl = pdv.getUrl() + "/bestSales";
+            log.debug("Fetching best sales from: {}", apiUrl);
 
             BestSalesDTO[] bestSalesArray = restTemplate.getForObject(apiUrl, BestSalesDTO[].class);
             List<BestSalesDTO> bestSalesFromPdv = Arrays.asList(bestSalesArray);
+            log.info("Received {} best sales from {}", bestSalesFromPdv.size(), pdv.getName());
 
             for (BestSalesDTO dto : bestSalesFromPdv) {
-                BestSales bestSales = new BestSales(
-                        dto.getDishId().intValue(),
-                        dto.getDishName(),
-                        dto.getQuantitySold(),
-                        dto.getTotalAmount(),
-                        LocalDate.now()
-                );
-                bestSalesDAO.saveBestSales(bestSales);
+                try {
+                    BestSales bestSales = new BestSales(
+                            dto.getDishId().intValue(),
+                            dto.getDishName(),
+                            dto.getQuantitySold(),
+                            dto.getTotalAmount(),
+                            LocalDate.now()
+                    );
+                    bestSalesDAO.saveBestSales(bestSales);
+                    log.debug("Saved best sales for dish {}", dto.getDishId());
+                } catch (SQLException e) {
+                    log.error("Failed to save best sales for dish {}: {}", dto.getDishId(), e.getMessage());
+                    throw e;
+                }
             }
         }
     }
@@ -56,6 +69,10 @@ public class BestSalesService {
         return allSales.stream()
                 .limit(limit)
                 .collect(Collectors.toList());
+    }
+
+    public List<BestSales> getAll(){
+        return bestSalesDAO.getRealBestSales();
     }
 
     @SneakyThrows

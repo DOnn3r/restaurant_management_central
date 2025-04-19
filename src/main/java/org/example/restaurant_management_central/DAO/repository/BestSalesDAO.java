@@ -58,7 +58,10 @@ public class BestSalesDAO {
             pstmt.setDouble(3, bestSales.getTotalAmount());
             pstmt.setDate(4, Date.valueOf(bestSales.getCalculationDate()));
 
-            pstmt.executeUpdate();
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Creating best sales failed, no rows affected.");
+            }
         }
     }
 }

@@ -34,9 +34,9 @@ public class CentralController {
     }
 
     @PostMapping("/synchronisation")
-    public ResponseEntity<String> syncBestSales() throws SQLException {
+    public List<BestSales> syncBestSales() throws SQLException {
         bestSalesService.syncBestSalesFromAllPoints();
-        return ResponseEntity.ok("Synchronisation des bestSales terminée !");
+        return bestSalesService.getAll();
     }
 
     @GetMapping("/bestSales")

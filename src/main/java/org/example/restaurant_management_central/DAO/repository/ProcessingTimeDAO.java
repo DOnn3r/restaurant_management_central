@@ -21,22 +21,24 @@ public class ProcessingTimeDAO {
     }
     public void saveProcessingTime(ProcessingTimeResponse processingTime) throws SQLException {
         String sql = """
-            
-                INSERT INTO processing_time 
-            (dish_id, duration, time_unit, calculation_type, synced_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-            """;
+        INSERT INTO processing_time 
+        (dish_id, duration, time_unit, calculation_type, synced_at)
+        VALUES (?, ?, ?, ?, ?)
+        """;
+
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setLong(1, processingTime.getDishId());
-            stmt.setDouble(3, processingTime.getDuration());
-            stmt.setString(4, String.valueOf(processingTime.getUnit()));
-            stmt.setString(5, String.valueOf(processingTime.getType()));
-            stmt.setTimestamp(6, Timestamp.valueOf(processingTime.getLastUpdated()));
+            stmt.setDouble(2, processingTime.getDuration()); // Correction: paramètre 2 ajouté
+            stmt.setString(3, processingTime.getUnit().name());
+            stmt.setString(4, processingTime.getType().name());
+            stmt.setTimestamp(5, Timestamp.valueOf(processingTime.getLastUpdated()));
 
-            stmt.executeUpdate();
-
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Creating processing time failed, no rows affected.");
+            }
         }
     }
 
