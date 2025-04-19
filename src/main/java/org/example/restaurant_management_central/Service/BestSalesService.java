@@ -22,7 +22,6 @@ public class BestSalesService {
     private final PointDeVenteDAO pointDeVenteDAO;
     private final RestTemplate restTemplate;
 
-    // Injection par constructeur
     @Autowired
     public BestSalesService(BestSalesDAO bestSalesDAO, PointDeVenteDAO pointDeVenteDAO, RestTemplate restTemplate) {
         this.bestSalesDAO = bestSalesDAO;
@@ -31,25 +30,21 @@ public class BestSalesService {
     }
 
     public void syncBestSalesFromAllPoints() throws SQLException {
-        // 1. Récupérer tous les points de vente
         List<PointDeVente> pointsDeVente = pointDeVenteDAO.getAllPointDeVente();
 
-        // 2. Pour chaque point de vente, appeler son API et sauvegarder les bestSales
         for (PointDeVente pdv : pointsDeVente) {
-            String apiUrl = pdv.getUrl() + "/bestSales"; // Ex: "http://localhost:8080/api/bestSales"
+            String apiUrl = pdv.getUrl() + "/bestSales";
 
-            // 3. Appeler l'API du point de vente (GET)
             BestSalesDTO[] bestSalesArray = restTemplate.getForObject(apiUrl, BestSalesDTO[].class);
             List<BestSalesDTO> bestSalesFromPdv = Arrays.asList(bestSalesArray);
 
-            // 4. Convertir les DTO en entités BestSales et sauvegarder
             for (BestSalesDTO dto : bestSalesFromPdv) {
                 BestSales bestSales = new BestSales(
                         dto.getDishId().intValue(),
                         dto.getDishName(),
                         dto.getQuantitySold(),
                         dto.getTotalAmount(),
-                        LocalDate.now() // Date de calcul
+                        LocalDate.now()
                 );
                 bestSalesDAO.saveBestSales(bestSales);
             }

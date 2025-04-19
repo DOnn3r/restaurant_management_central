@@ -34,8 +34,8 @@ public class BestSalesDAO {
 
             while (rs.next()) {
                 bestSalesList.add(new BestSales(
-                        rs.getInt("id"),          // dishId
-                        rs.getString("dish_name"), // dishName
+                        rs.getInt("id"),
+                        rs.getString("dish_name"),
                         rs.getInt("total_quantity"),
                         rs.getDouble("total_amount"),
                         rs.getDate("calculation_date").toLocalDate()

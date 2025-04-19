@@ -12,4 +12,11 @@ public class Dish {
     private Integer originalId;
     private String name;
     private PointDeVente pointDeVente;
+
+    public Dish() {
+        
+    }
+
+    public void setPointDeVenteId(String pointDeVenteId) {
+    }
 }
